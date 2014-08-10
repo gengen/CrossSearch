@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>
+
+<string-array name="category_array">
+<item>全て</item>
+<item>本</item>
+<item>家電・エレクトロニクス</item>
+<item>おもちゃ・ホビー</item>
+<item>ゲーム</item>
+<item>音楽</item>
+<item>DVD</item>
+<item>美容・コスメ</item>
+<item>食品</item>
+<item>ヘルスケア</item>
+<item>インテリア</item>
+<item>スポーツ・アウトドア</item>
+<item>車・バイク</item>
+<item>時計</item>
+</string-array>
+</resources>

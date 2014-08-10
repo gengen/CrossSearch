@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CrossSearch</string>
+    <string name="action_category">Category</string>
+	<string name="tab1">Amazon</string>
+	<string name="tab2">Rakuten</string>
+
+</resources>
