@@ -150,7 +150,7 @@ public class AmazonFragment extends Fragment {
     	mTotalPages = 1;
     	
     	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.amazon_bottom);
-    	layout.setVisibility(View.GONE);
+    	layout.setVisibility(View.INVISIBLE);
     	
         //サーチワードクリア
     	TextView text = (TextView)mView.findViewById(R.id.amazon_text);

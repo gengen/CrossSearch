@@ -8,7 +8,8 @@
     
     <string name="tab1">Amazon</string>
     <string name="tab2">楽天</string>
-
+    <string name="tab3">Yahoo</string>
+    
     <string name="prev">&lt;&lt;前</string>
     <string name="next">次&gt;&gt;</string>
     

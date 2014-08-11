@@ -28,7 +28,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-public class RakutenFragment extends Fragment {
+public class YahooFragment extends Fragment {
 	public static final String TAG = CrossSearchActivity.TAG;
 	public static final boolean DEBUG = CrossSearchActivity.DEBUG;
 
@@ -44,6 +44,7 @@ public class RakutenFragment extends Fragment {
     View mView;
 	Handler mHandler = new Handler();
 	
+	//TODO Yahoo用コード指定
 	String[] mCategories = {
 			"0",		//全て
 			"200162",	//本
@@ -63,8 +64,8 @@ public class RakutenFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    	mView = inflater.inflate(R.layout.rakuten_fragment, container, false);
-    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.rakuten_bottom);
+    	mView = inflater.inflate(R.layout.yahoo_fragment, container, false);
+    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.yahoo_bottom);
     	layout.setVisibility(View.GONE);
     	
 		setListener();
@@ -133,27 +134,26 @@ public class RakutenFragment extends Fragment {
     	mPage = 1;
     	mTotalPages = 1;
     	
-    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.rakuten_bottom);
+    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.yahoo_bottom);
     	layout.setVisibility(View.INVISIBLE);
     	
         //サーチワードクリア
-    	TextView text = (TextView)mView.findViewById(R.id.rakuten_text);
+    	TextView text = (TextView)mView.findViewById(R.id.yahoo_text);
     	text.setText("");
     }
 
+    //TODO Yahoo用リクエスト作成
     private String createRequest(String key, int page){
-    	String baseUrl = "https://app.rakuten.co.jp/services/api/IchibaItem/Search/20140222?";
+    	String baseUrl = "http://shopping.yahooapis.jp/ShoppingWebService/V1/itemSearch?";
 
     	Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
-    	builder.appendQueryParameter("applicationId", "1052129032839387300");
-    	builder.appendQueryParameter("affiliateId", "12f43af5.cfa8f2c5.12f43af6.5da98e59");
-    	builder.appendQueryParameter("keyword", key);
-    	builder.appendQueryParameter("format", "xml");
-    	//builder.appendQueryParameter("genreId", "0"); //0=allmCategories[mCategoryIndex]
-    	builder.appendQueryParameter("genreId", mCategories[mCategoryIndex]);
+    	builder.appendQueryParameter("appid", "dj0zaiZpPWdPYXNJd2l6N3pDbCZzPWNvbnN1bWVyc2VjcmV0Jng9MGY-");
+    	builder.appendQueryParameter("affiliate_type", "yid");
+    	builder.appendQueryParameter("affiliate_id", "GHd3n2.Wmd.OUaSUm5mP");
+    	builder.appendQueryParameter("query", key);
+    	builder.appendQueryParameter("image_size", "76");
     	builder.appendQueryParameter("hits", "10");
-    	builder.appendQueryParameter("page", "" + page);
-    	builder.appendQueryParameter("carrier", "2"); //2=smartphone
+    	builder.appendQueryParameter("offset", "" + (page-1)*10); //1件目が0
     	builder.build();
     	if(DEBUG){
     		Log.d(TAG, "URL = " + builder.build());
@@ -177,6 +177,7 @@ public class RakutenFragment extends Fragment {
     	return response;
     }
     
+    //TODO Yahoo用リスト作成
 	private void createList(HttpResponse response){
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		try {
@@ -201,34 +202,40 @@ public class RakutenFragment extends Fragment {
 					}
 					
 					//商品説明の始まり
-					if(tagName.equals("Item")){
+					if(tagName.equals("Hit")){
 				    	data = new ProductItemData();
 					}
+					//TODO 検索結果件数
 					else if(tagName.equals("count")){
 						parser.next();
 						mTotalResults = Integer.valueOf(parser.getText());
 					}
+					//TODO ページ数
 					else if(tagName.equals("pageCount")){
 						parser.next();
 						mTotalPages = Integer.valueOf(parser.getText());
 					}
-					else if(tagName.equals("affiliateUrl")){
-						parser.next();
-						String url = parser.getText();
-						data.setDetailURL(url);
+					else if(tagName.equals("Url")){
+						if(data.getDetailURL() ==  null){
+							parser.next();
+							String url = parser.getText();
+							data.setDetailURL(url);
+						}
 					}
-					else if(tagName.equals("itemName")){
-						parser.next();
-						String title = parser.getText();
-						data.setTitle(title);
+					else if(tagName.equals("Name")){
+						if(data.getTitle() == null){
+							parser.next();
+							String title = parser.getText();
+							data.setTitle(title);
+						}
 					}
-					else if(tagName.equals("itemPrice")){
+					else if(tagName.equals("Price")){
 						parser.next();
 						String price = parser.getText();
 						price = getString(R.string.price_prefix) + price;
 						data.setPrice(price);
 					}
-					else if(tagName.equals("imageUrl")){
+					else if(tagName.equals("Small")){
 						if(imageFlag){
 							parser.next();
 							String url = parser.getText();
@@ -236,7 +243,7 @@ public class RakutenFragment extends Fragment {
 							imageFlag = false;
 						}
 					}
-					else if(tagName.equals("smallImageUrls")){
+					else if(tagName.equals("Image")){
 						imageFlag = true;
 					}
 
@@ -248,7 +255,7 @@ public class RakutenFragment extends Fragment {
 						Log.d(TAG, "end tag name = " + tagName);
 					}
 					//商品説明の終わり
-					if(tagName.equals("Item")){
+					if(tagName.equals("Hit")){
 						if(data.getPrice() == null){
 							data.setPrice(getString(R.string.price_not_found));
 						}
@@ -299,12 +306,12 @@ public class RakutenFragment extends Fragment {
 
 		String results = getString(R.string.search_result) + " " + mTotalResults + getString(R.string.search_unit);
 		results = results + ": " + categories[mCategoryIndex] + " > " + "\"" + mKeyword + "\"";
-    	TextView text = (TextView)mView.findViewById(R.id.rakuten_text);
+    	TextView text = (TextView)mView.findViewById(R.id.yahoo_text);
     	text.setText(results);		
 	}
 	
 	private void displayPage(){
-    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.rakuten_bottom);
+    	LinearLayout layout = (LinearLayout)mView.findViewById(R.id.yahoo_bottom);
     	TextView view = (TextView)mView.findViewById(R.id.page);
     	view.setText("" + mPage);
     	layout.setVisibility(View.VISIBLE);
@@ -325,4 +332,3 @@ public class RakutenFragment extends Fragment {
     	}		
 	}
 }
-

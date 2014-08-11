@@ -56,9 +56,13 @@ public class CrossSearchActivity extends ActionBarActivity {
         actionBar.addTab(actionBar.newTab()/*.setIcon(R.drawable.ic_menu_search)*/.setText(R.string.tab2).setTabListener(
         		new MyTabListener<RakutenFragment>(this, "tab2", RakutenFragment.class)));
         
+        actionBar.addTab(actionBar.newTab()/*.setIcon(R.drawable.ic_menu_search)*/.setText(R.string.tab3).setTabListener(
+        		new MyTabListener<YahooFragment>(this, "tab3", YahooFragment.class)));
+        
         alertNotifyDialog();
 	}
 	
+	//アプリ説明表示
     private void alertNotifyDialog(){
 		SharedPreferences sharePref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		boolean flag = sharePref.getBoolean("displayFlag", true);
@@ -117,9 +121,11 @@ public class CrossSearchActivity extends ActionBarActivity {
 			 
 			 Fragment amazon = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab1");
 			 Fragment rakuten = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab2");
+			 Fragment yahoo = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab3");
 			 //タブそれぞれでサーチ
 			 ((AmazonFragment)amazon).searchProductInfo(query, mCategoryIndex, 1);
 			 ((RakutenFragment)rakuten).searchProductInfo(query, mCategoryIndex, 1);
+			 ((YahooFragment)yahoo).searchProductInfo(query, mCategoryIndex, 1);
 			 
 			 return true;
 		 }
@@ -185,13 +191,15 @@ public class CrossSearchActivity extends ActionBarActivity {
     protected void onResume(){
         super.onResume();
         
-        //ソフトキーボードを非表示にする
-        /*
-        InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        */
-
+		//ソフトキーボードを非表示にする
+        //TODO 戻ったときの非表示
+		InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+		if(mSearchView != null){
+			imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		}
+        
         //UPナビゲーションで戻ってきたときは、元のタブを表示する
+        /*
         SharedPreferences pref = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         if((pref.getBoolean("navigation", false))){
         	ActionBar actionBar = getSupportActionBar();
@@ -202,6 +210,7 @@ public class CrossSearchActivity extends ActionBarActivity {
             editor.putBoolean("navigation", false);
             editor.commit();
         }
+        */
     }
 	
     @Override
