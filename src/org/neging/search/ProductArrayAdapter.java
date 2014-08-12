@@ -37,30 +37,25 @@ public class ProductArrayAdapter extends ArrayAdapter<ProductItemData> {
         //}
 
         ProductItemData data = (ProductItemData)getItem(position);
+        
+        //取得できなかったときの処理
+        if(data.getErrFlag()){
+            TextView name = (TextView)convertView.findViewById(R.id.item_title);
+            name.setText(R.string.search_error);
+            return convertView;
+        }
 
         //サムネイル
-        //TODO サムネイル無い場合の処理
         ImageView image = (ImageView)convertView.findViewById(R.id.item_thumbnail);
         String url = data.getImageURL();
-        ImageTask task = new ImageTask(url, image);
-        task.execute();
+        if(url != null){
+        	ImageTask task = new ImageTask(url, image);
+        	task.execute();
+        }
         
         //商品名
         TextView name = (TextView)convertView.findViewById(R.id.item_title);
-        //商品のURL
-        //final String detailUrl = data.getDetailURL(); 
         name.setText(data.getTitle());
-        /*
-        name.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(mContext, ProductWebActivity.class);
-				intent.putExtra("url", detailUrl);
-				mContext.startActivity(intent);
-			}
-        });
-        */
-        
         //価格
         TextView price = (TextView)convertView.findViewById(R.id.item_price);
         price.setText(data.getPrice());

@@ -1,12 +1,21 @@
 package org.neging.search;
 
 public class ProductItemData {
+	private boolean mErrFlag = false;
 	private String mImageUrl;
 	private String mTitle;
 	private String mDetailUrl;
 	private String mPrice;
 	private String mReviewUrl;
 
+	public void setErrFlag(){
+		mErrFlag = true;
+	}
+	
+	public boolean getErrFlag(){
+		return mErrFlag;
+	}
+	
 	public void setImageURL(String url){
 		mImageUrl = url;
 	}

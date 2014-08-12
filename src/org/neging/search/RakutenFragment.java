@@ -57,8 +57,7 @@ public class RakutenFragment extends Fragment {
 			"100938",	//ヘルスケア
 			"100804",	//インテリア
 			"101070",	//スポーツ・アウトドア
-			"101114",	//車・バイク
-			"558929",	//時計
+			"101114"	//車・バイク
 	};
 
     @Override
@@ -174,6 +173,11 @@ public class RakutenFragment extends Fragment {
     		//do nothing
 		}
     	
+    	//200OK以外はnullとする
+		if(response == null || response.getStatusLine().getStatusCode() != 200){
+			response = null;
+		}
+    	
     	return response;
     }
     
@@ -263,7 +267,10 @@ public class RakutenFragment extends Fragment {
 			}
 		}
 		catch (Exception e) {
-			return;
+	        mProductList = new ArrayList<ProductItemData>();
+	    	ProductItemData data = new ProductItemData();
+	    	data.setErrFlag();
+	    	mProductList.add(data);
 		}
 		
 		mHandler.post(new Runnable(){
@@ -290,6 +297,14 @@ public class RakutenFragment extends Fragment {
 		        displayKeyword();
 		        //ページ送り、戻り
 		    	displayPage();
+		    	//プログレスダイアログ終了
+		    	try{
+		    		CrossSearchActivity activity = (CrossSearchActivity)getActivity();
+		    		activity.setFinished("tab2");
+		    	}
+		    	catch(ClassCastException e){
+		    		//nothing to do
+		    	}
 			}
 		});
     }

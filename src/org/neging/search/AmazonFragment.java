@@ -1,21 +1,12 @@
 package org.neging.search;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -27,20 +18,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 public class AmazonFragment extends Fragment {
@@ -72,10 +57,9 @@ public class AmazonFragment extends Fragment {
 			"HealthPersonalCare",	//ヘルスケア
 			"Kitchen",			//インテリア
 			"SportingGoods",	//スポーツ・アウトドア
-			"Automotive",		//車・バイク
-			"Watches",			//時計
+			"Automotive"		//車・バイク
 	};
-	
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	mView = inflater.inflate(R.layout.amazon_fragment, container, false);
@@ -130,7 +114,6 @@ public class AmazonFragment extends Fragment {
             		Log.d(TAG, "url = " + request);
             	}
             	HttpResponse response = doHttpRequest(request);
-            	//TODO レスポンスチェック(null and statusCode)
             	if(response == null){
             		Log.e(TAG, "response is null");
             	}
@@ -184,6 +167,11 @@ public class AmazonFragment extends Fragment {
     	}
     	catch (Exception e) {
     		//do nothing
+		}
+    	
+    	//200OK以外はnullとする
+		if(response == null || response.getStatusLine().getStatusCode() != 200){
+			response = null;
 		}
     	
     	return response;
@@ -292,7 +280,10 @@ public class AmazonFragment extends Fragment {
 			}
 		}
 		catch (Exception e) {
-			return;
+	        mProductList = new ArrayList<ProductItemData>();
+	    	ProductItemData data = new ProductItemData();
+	    	data.setErrFlag();
+	    	mProductList.add(data);
 		}
 		
 		mHandler.post(new Runnable(){
@@ -319,6 +310,14 @@ public class AmazonFragment extends Fragment {
 		        displayKeyword();
 		        //ページ送り、戻り
 		    	displayPage();
+		    	//プログレスダイアログ終了
+		    	try{
+		    		CrossSearchActivity activity = (CrossSearchActivity)getActivity();
+		    		activity.setFinished("tab1");
+		    	}
+		    	catch(ClassCastException e){
+		    		//nothing to do
+		    	}
 			}
 		});
     }

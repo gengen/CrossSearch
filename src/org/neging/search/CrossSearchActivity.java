@@ -11,8 +11,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.widget.SearchView;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
@@ -28,7 +28,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-public class CrossSearchActivity extends ActionBarActivity {
+public class CrossSearchActivity extends ActionBarActivity{
 	public static final String TAG = "CrossSearch";
 	public static final boolean DEBUG = true;
     public static final String PREF_KEY = "pref";
@@ -39,6 +39,13 @@ public class CrossSearchActivity extends ActionBarActivity {
     int mCategoryIndex = 0;
     
 	boolean mDisplayFlag = false;
+	
+	//処理終了判定フラグ
+	boolean mFinishTab1 = false;
+	boolean mFinishTab2 = false;
+	boolean mFinishTab3 = false;
+	
+    ProgressDialog mProgressDialog = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +66,7 @@ public class CrossSearchActivity extends ActionBarActivity {
         actionBar.addTab(actionBar.newTab()/*.setIcon(R.drawable.ic_menu_search)*/.setText(R.string.tab3).setTabListener(
         		new MyTabListener<YahooFragment>(this, "tab3", YahooFragment.class)));
         
+        initProgressDialog();
         alertNotifyDialog();
 	}
 	
@@ -94,6 +102,38 @@ public class CrossSearchActivity extends ActionBarActivity {
 			});
 		}
     }
+    
+    void initProgressDialog(){
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage(getString(R.string.dialog_progress_message));
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+    }
+    
+    public void setFinished(String tab){
+    	if(tab.equals("tab1")){
+    		mFinishTab1 = true;
+    	}
+    	else if(tab.equals("tab2")){
+    		mFinishTab2 = true;
+    	}
+    	if(tab.equals("tab3")){
+    		mFinishTab3 = true;
+    	}
+
+    	//現状はどれかひとつ終了すればよい
+    	if(mFinishTab1 || mFinishTab2 || mFinishTab3){
+    		//TODO プログレスバー終了
+			 mProgressDialog.dismiss();
+    		
+    		mFinishTab1 = false;
+    		mFinishTab2 = false;
+    		mFinishTab3 = false;
+    		
+    		InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
+    		imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    	}
+    }
 	
 	 // SearchVIewのリスナー
 	 private final SearchView.OnQueryTextListener mOnQueryTextListener = new SearchView.OnQueryTextListener() {
@@ -119,6 +159,9 @@ public class CrossSearchActivity extends ActionBarActivity {
 				 Log.d(TAG, "Fragment num = " + fragments.size());
 			 }
 			 
+			 //プログレスダイアログ表示
+			 mProgressDialog.show();
+		    	
 			 Fragment amazon = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab1");
 			 Fragment rakuten = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab2");
 			 Fragment yahoo = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab3");
@@ -142,7 +185,7 @@ public class CrossSearchActivity extends ActionBarActivity {
 		// SearchViewを取得する
 		mSearchView = (SearchView)MenuItemCompat.getActionView(searchItem);
 		 
-		//mSearchView.setIconifiedByDefault(true);
+		mSearchView.setIconifiedByDefault(true);
 		mSearchView.setSubmitButtonEnabled(true);
 		mSearchView.setQueryHint(getString(R.string.search_title));
 		mSearchView.setOnQueryTextListener(mOnQueryTextListener);

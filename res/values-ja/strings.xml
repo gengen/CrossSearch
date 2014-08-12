@@ -18,8 +18,11 @@
     <string name="price_not_found">サイト参照</string>
     <string name="price_prefix">￥</string>
     
+    <string name="dialog_progress_message">情報取得中</string>
+    
     <string name="search_result">検索結果</string>
     <string name="search_unit">件</string>
+    <string name="search_error">情報を取得できませんでした</string>
 
     <string name="action_category_title">カテゴリを選択</string>
 

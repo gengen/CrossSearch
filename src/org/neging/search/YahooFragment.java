@@ -47,19 +47,18 @@ public class YahooFragment extends Fragment {
 	//TODO Yahoo用コード指定
 	String[] mCategories = {
 			"0",		//全て
-			"200162",	//本
-			"562637",	//家電・エレクトロニクス
-			"101164",	//おもちゃ・ホビー
-			"101164",	//ゲーム
-			"101240",	//音楽
-			"101240",	//DVD
-			"100939",	//美容・コスメ
-			"100227",	//食品
-			"100938",	//ヘルスケア
-			"100804",	//インテリア
-			"101070",	//スポーツ・アウトドア
-			"101114",	//車・バイク
-			"558929",	//時計
+			"10002",	//本
+			"2505",	//家電・エレクトロニクス
+			"2511",	//おもちゃ・ホビー
+			"2511",	//ゲーム
+			"2516",	//音楽
+			"2517",	//DVD
+			"2501",	//美容・コスメ
+			"2498",	//食品
+			"2500",	//ヘルスケア
+			"2506",	//インテリア
+			"2512",	//スポーツ・アウトドア
+			"2514"	//車・バイク
 	};
 
     @Override
@@ -151,6 +150,7 @@ public class YahooFragment extends Fragment {
     	builder.appendQueryParameter("affiliate_type", "yid");
     	builder.appendQueryParameter("affiliate_id", "GHd3n2.Wmd.OUaSUm5mP");
     	builder.appendQueryParameter("query", key);
+    	builder.appendQueryParameter("category_id", mCategories[mCategoryIndex]);
     	builder.appendQueryParameter("image_size", "76");
     	builder.appendQueryParameter("hits", "10");
     	builder.appendQueryParameter("offset", "" + (page-1)*10); //1件目が0
@@ -174,10 +174,14 @@ public class YahooFragment extends Fragment {
     		//do nothing
 		}
     	
+    	//200OK以外はnullとする
+		if(response == null || response.getStatusLine().getStatusCode() != 200){
+			response = null;
+		}
+    	
     	return response;
     }
     
-    //TODO Yahoo用リスト作成
 	private void createList(HttpResponse response){
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
 		try {
@@ -201,19 +205,13 @@ public class YahooFragment extends Fragment {
 						Log.d(TAG, "tag name = " + tagName);
 					}
 					
+					if(tagName.equals("ResultSet")){
+						mTotalResults = Integer.valueOf(parser.getAttributeValue(null, "totalResultsAvailable"));
+						mTotalPages = (mTotalResults / 10);
+					}
 					//商品説明の始まり
-					if(tagName.equals("Hit")){
+					else if(tagName.equals("Hit")){
 				    	data = new ProductItemData();
-					}
-					//TODO 検索結果件数
-					else if(tagName.equals("count")){
-						parser.next();
-						mTotalResults = Integer.valueOf(parser.getText());
-					}
-					//TODO ページ数
-					else if(tagName.equals("pageCount")){
-						parser.next();
-						mTotalPages = Integer.valueOf(parser.getText());
 					}
 					else if(tagName.equals("Url")){
 						if(data.getDetailURL() ==  null){
@@ -270,7 +268,10 @@ public class YahooFragment extends Fragment {
 			}
 		}
 		catch (Exception e) {
-			return;
+	        mProductList = new ArrayList<ProductItemData>();
+	    	ProductItemData data = new ProductItemData();
+	    	data.setErrFlag();
+	    	mProductList.add(data);
 		}
 		
 		mHandler.post(new Runnable(){
@@ -297,6 +298,14 @@ public class YahooFragment extends Fragment {
 		        displayKeyword();
 		        //ページ送り、戻り
 		    	displayPage();
+		    	//プログレスダイアログ終了
+		    	try{
+		    		CrossSearchActivity activity = (CrossSearchActivity)getActivity();
+		    		activity.setFinished("tab3");
+		    	}
+		    	catch(ClassCastException e){
+		    		//nothing to do
+		    	}
 			}
 		});
     }
