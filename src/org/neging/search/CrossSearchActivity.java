@@ -130,8 +130,10 @@ public class CrossSearchActivity extends ActionBarActivity{
     		mFinishTab2 = false;
     		mFinishTab3 = false;
     		
-    		InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
-    		imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    		//フォーカスをはずしてソフトキーボードを非表示にする
+    		if(mSearchView != null){
+    			mSearchView.clearFocus();
+    		}
     	}
     }
 	
@@ -149,8 +151,14 @@ public class CrossSearchActivity extends ActionBarActivity{
 			 }
 			 
 			 //ソフトキーボードを非表示にする
+			 /*
 			 InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
              imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+             */
+			 //フォーカスをはずしてソフトキーボードを非表示にする
+			 if(mSearchView != null){
+				 mSearchView.clearFocus();
+			 }
 			 
 			 FragmentManager manager = getSupportFragmentManager();
 			 List<Fragment> fragments = manager.getFragments();
@@ -236,10 +244,16 @@ public class CrossSearchActivity extends ActionBarActivity{
         
 		//ソフトキーボードを非表示にする
         //TODO 戻ったときの非表示
+        /*
 		InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
 		if(mSearchView != null){
 			imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 		}
+		*/
+		 //フォーカスをはずしてソフトキーボードを非表示にする
+		 if(mSearchView != null){
+			 mSearchView.clearFocus();
+		 }
         
         //UPナビゲーションで戻ってきたときは、元のタブを表示する
         /*
