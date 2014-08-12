@@ -1,6 +1,10 @@
 package org.neging.search;
 
+import java.io.File;
 import java.util.List;
+
+import jp.beyond.sdk.Bead;
+import jp.beyond.sdk.Bead.ContentsOrientation;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -46,11 +50,13 @@ public class CrossSearchActivity extends ActionBarActivity{
 	boolean mFinishTab3 = false;
 	
     ProgressDialog mProgressDialog = null;
+    
+    //BEAD ad
+    private Bead mBeadExit = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//super.onSaveInstanceState(savedInstanceState);
 		
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -68,6 +74,10 @@ public class CrossSearchActivity extends ActionBarActivity{
         
         initProgressDialog();
         alertNotifyDialog();
+        
+        //BEAD ad
+        mBeadExit = Bead. createExitInstance("df90e2a0ddfc86513c57c79fe09f2326699e6fb5ad2df0d6", ContentsOrientation.Auto);
+        mBeadExit.requestAd(this);		
 	}
 	
 	//アプリ説明表示
@@ -243,7 +253,6 @@ public class CrossSearchActivity extends ActionBarActivity{
         super.onResume();
         
 		//ソフトキーボードを非表示にする
-        //TODO 戻ったときの非表示
         /*
 		InputMethodManager imm = (InputMethodManager)getSystemService(getApplicationContext().INPUT_METHOD_SERVICE);
 		if(mSearchView != null){
@@ -269,6 +278,12 @@ public class CrossSearchActivity extends ActionBarActivity{
         }
         */
     }
+    
+    @Override
+    public void onBackPressed(){
+    	// 広告ダイアログ表示
+    	mBeadExit.showAd(this);
+    }
 	
     @Override
     protected void onPause(){
@@ -278,6 +293,34 @@ public class CrossSearchActivity extends ActionBarActivity{
     	ActionBar bar = getSupportActionBar();
     	mTabId = bar.getSelectedNavigationIndex();
     	//Log.d(TAG, "mTabId = " + mTabId);
+    }
+    
+    @Override
+	public void onDestroy(){
+    	super.onDestroy();
+    	
+    	// 広告終了
+    	if(mBeadExit != null){
+    		mBeadExit.endAd();
+    	}
+    	
+    	deleteCache(getCacheDir());
+    }
+
+    public static boolean deleteCache(File dir) {
+    	if(dir==null) {
+    		return false;
+    	}
+    	if (dir.isDirectory()) {
+    		String[] children = dir.list();
+    		for (int i = 0; i < children.length; i++) {
+    			boolean success = deleteCache(new File(dir, children[i]));
+    			if (!success) {
+    				return false;
+    			}
+    		}
+    	}
+    	return dir.delete();
     }
 	
     //for 2.3
