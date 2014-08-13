@@ -41,6 +41,7 @@ public class CrossSearchActivity extends ActionBarActivity{
     int mTabId = 0;
     
     int mCategoryIndex = 0;
+    int mSortIndex = 0;
     
 	boolean mDisplayFlag = false;
 	
@@ -184,9 +185,9 @@ public class CrossSearchActivity extends ActionBarActivity{
 			 Fragment rakuten = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab2");
 			 Fragment yahoo = CrossSearchActivity.this.getSupportFragmentManager().findFragmentByTag("tab3");
 			 //タブそれぞれでサーチ
-			 ((AmazonFragment)amazon).searchProductInfo(query, mCategoryIndex, 1);
-			 ((RakutenFragment)rakuten).searchProductInfo(query, mCategoryIndex, 1);
-			 ((YahooFragment)yahoo).searchProductInfo(query, mCategoryIndex, 1);
+			 ((AmazonFragment)amazon).searchProductInfo(query, mCategoryIndex, mSortIndex, 1);
+			 ((RakutenFragment)rakuten).searchProductInfo(query, mCategoryIndex, mSortIndex, 1);
+			 ((YahooFragment)yahoo).searchProductInfo(query, mCategoryIndex, mSortIndex, 1);
 			 
 			 return true;
 		 }
@@ -217,8 +218,12 @@ public class CrossSearchActivity extends ActionBarActivity{
 		// as you specify a parent activity in AndroidManifest.xml.
 		
 		int id = item.getItemId();
-		if (id == R.id.action_category) {
+		if(id == R.id.action_category){
 			selectCategory();
+			return true;
+		}
+		else if(id == R.id.action_sort){
+			selectSort();
 			return true;
 		}
 
@@ -231,7 +236,7 @@ public class CrossSearchActivity extends ActionBarActivity{
         new AlertDialog.Builder(this)
         .setIcon(android.R.drawable.ic_dialog_info)
         .setTitle(R.string.action_category_title)
-        .setSingleChoiceItems(itemList, 0, new DialogInterface.OnClickListener() {
+        .setSingleChoiceItems(itemList, mCategoryIndex, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 mCategoryIndex = which;
             }
@@ -242,6 +247,45 @@ public class CrossSearchActivity extends ActionBarActivity{
             	Toast.makeText(
             			CrossSearchActivity.this, 
             			"カテゴリを「" + categories[mCategoryIndex] + "」に設定しました",
+            			Toast.LENGTH_LONG)
+            			.show();
+            }
+        })
+       .show();        
+    }
+    
+    private void selectSort(){
+    	//カテゴリが全ての場合は、ソート設定できないためアラートを出す
+    	if(mCategoryIndex == 0){
+            new AlertDialog.Builder(this)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setTitle(R.string.dialog_notify_title)
+            .setMessage(R.string.dialog_alert_message)
+            .setPositiveButton(R.string.dialog_submit, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                	//nothing to do
+                }
+            })
+           .show();
+            return;
+    	}
+    	
+        final String[] itemList = getResources().getStringArray(R.array.sort_array);
+        
+        new AlertDialog.Builder(this)
+        .setIcon(android.R.drawable.ic_dialog_info)
+        .setTitle(R.string.action_sort_title)
+        .setSingleChoiceItems(itemList, mSortIndex, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                mSortIndex = which;
+            }
+        })
+        .setPositiveButton(R.string.dialog_submit, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) { //whichは常に-1
+        		String[] sorts = getResources().getStringArray(R.array.sort_array);
+            	Toast.makeText(
+            			CrossSearchActivity.this, 
+            			"並べ替えを「" + sorts[mSortIndex] + "」に設定しました",
             			Toast.LENGTH_LONG)
             			.show();
             }

@@ -16,4 +16,10 @@
 <item>スポーツ・アウトドア</item>
 <item>車・バイク</item>
 </string-array>
+
+<string-array name="sort_array">
+<item>キーワード関連順</item>
+<item>価格の低い順</item>
+<item>価格の高い順</item>
+</string-array>
 </resources>

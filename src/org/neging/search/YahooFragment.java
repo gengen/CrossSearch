@@ -33,10 +33,11 @@ public class YahooFragment extends Fragment {
 	public static final boolean DEBUG = CrossSearchActivity.DEBUG;
 
 	int mPage = 1;
-	int mCategoryIndex = 0;
 	int mTotalPages = 1;
 	int mTotalResults = 0;
     String mKeyword;
+	int mCategoryIndex = 0;
+	int mSortIndex = 0;
 
     //商品リスト
     ArrayList<ProductItemData> mProductList = null;
@@ -44,7 +45,6 @@ public class YahooFragment extends Fragment {
     View mView;
 	Handler mHandler = new Handler();
 	
-	//TODO Yahoo用コード指定
 	String[] mCategories = {
 			"0",		//全て
 			"10002",	//本
@@ -60,7 +60,13 @@ public class YahooFragment extends Fragment {
 			"2512",	//スポーツ・アウトドア
 			"2514"	//車・バイク
 	};
-
+	
+	String[] mSorts = {
+			"score",	//指定無し
+			"+price",	//価格の低い順
+			"-price"	//価格の高い順
+	};
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     	mView = inflater.inflate(R.layout.yahoo_fragment, container, false);
@@ -79,7 +85,7 @@ public class YahooFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				if(mPage > 1){
-					searchProductInfo(mKeyword, mCategoryIndex, --mPage);
+					searchProductInfo(mKeyword, mCategoryIndex, mSortIndex, --mPage);
 				}
 			}
 		});
@@ -90,20 +96,27 @@ public class YahooFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if(mPage < mTotalPages){
-					searchProductInfo(mKeyword, mCategoryIndex, ++mPage);
+					searchProductInfo(mKeyword, mCategoryIndex, mSortIndex, ++mPage);
 				}
 			}
 		});		
 	}
     
     //TODO カテゴリの引渡し
-    public void searchProductInfo(String keyword, int category, int page){
+    public void searchProductInfo(String keyword, int category, int sort, int page){
     	if(mKeyword != null && !mKeyword.equals(keyword)){
     		clearView();
     	}
     	
     	final String key = keyword;
     	mKeyword = keyword;
+    	//カテゴリがAllの場合はsortは設定できない
+    	if(category == 0){
+        	mSortIndex = 0;
+    	}
+    	else{
+    		mSortIndex = sort;
+    	}
     	mCategoryIndex = category;
     	final int p = page;
 
@@ -141,7 +154,6 @@ public class YahooFragment extends Fragment {
     	text.setText("");
     }
 
-    //TODO Yahoo用リクエスト作成
     private String createRequest(String key, int page){
     	String baseUrl = "http://shopping.yahooapis.jp/ShoppingWebService/V1/itemSearch?";
 
@@ -153,6 +165,7 @@ public class YahooFragment extends Fragment {
     	builder.appendQueryParameter("category_id", mCategories[mCategoryIndex]);
     	builder.appendQueryParameter("image_size", "76");
     	builder.appendQueryParameter("hits", "10");
+		builder.appendQueryParameter("sort", mSorts[mSortIndex]);
     	builder.appendQueryParameter("offset", "" + (page-1)*10); //1件目が0
     	builder.build();
     	if(DEBUG){

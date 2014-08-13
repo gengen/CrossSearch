@@ -33,10 +33,11 @@ public class AmazonFragment extends Fragment {
 	public static final boolean DEBUG = CrossSearchActivity.DEBUG;
 
 	int mPage = 1;
-	int mCategoryIndex = 0;
 	int mTotalPages = 1;
 	int mTotalResults = 0;
     String mKeyword;
+	int mCategoryIndex = 0;
+	int mSortIndex = 0;
 
     //商品リスト
     ArrayList<ProductItemData> mProductList = null;
@@ -59,6 +60,19 @@ public class AmazonFragment extends Fragment {
 			"SportingGoods",	//スポーツ・アウトドア
 			"Automotive"		//車・バイク
 	};
+	
+	String[] mSorts = {
+			"",			//指定無し
+			"price",	//価格の低い順
+			"-price"	//価格の高い順
+	};
+    
+	//本はソートの文字列が他と異なる
+	String[] mSortsBook = {
+			"",					//指定無し
+			"pricerank",		//価格の低い順
+			"inverse-pricerank"	//価格の高い順
+	};
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,7 +92,7 @@ public class AmazonFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				if(mPage > 1){
-					searchProductInfo(mKeyword, mCategoryIndex, --mPage);
+					searchProductInfo(mKeyword, mCategoryIndex, mSortIndex, --mPage);
 				}
 			}
 		});
@@ -89,15 +103,14 @@ public class AmazonFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if(mPage < mTotalPages){
-					searchProductInfo(mKeyword, mCategoryIndex, ++mPage);
+					searchProductInfo(mKeyword, mCategoryIndex, mSortIndex, ++mPage);
 				}
 			}
 		});		
 	}
     
     //TODO 言語の引渡し
-	//TODO プログレスダイアログ
-    public void searchProductInfo(String keyword, int category, int page){
+    public void searchProductInfo(String keyword, int category, int sort, int page){
     	if(mKeyword != null && !mKeyword.equals(keyword)){
     		clearView();
     	}
@@ -105,6 +118,13 @@ public class AmazonFragment extends Fragment {
     	final String key = keyword;
     	mKeyword = keyword;
     	mCategoryIndex = category;
+    	//カテゴリがAllの場合はsortは設定できない
+    	if(category == 0){
+        	mSortIndex = 0;
+    	}
+    	else{
+    		mSortIndex = sort;
+    	}
     	final int p = page;
     	
         Thread t = new Thread(){
@@ -144,11 +164,16 @@ public class AmazonFragment extends Fragment {
     	String baseUrl = "http://searchproductinfo.appspot.com?";
 
     	Uri.Builder builder = Uri.parse(baseUrl).buildUpon();
-    	//builder.appendQueryParameter("cat", "All");
     	builder.appendQueryParameter("cat", mCategories[mCategoryIndex]);
     	builder.appendQueryParameter("hl", "JP");
     	builder.appendQueryParameter("key", key);
     	builder.appendQueryParameter("p", "" + page);
+    	if(mCategories[mCategoryIndex].equals("Books")){
+    		builder.appendQueryParameter("sort", mSortsBook[mSortIndex]);    		
+    	}
+    	else{
+    		builder.appendQueryParameter("sort", mSorts[mSortIndex]);    		
+    	}
     	builder.build();
     	if(DEBUG){
     		Log.d(TAG, "URL = " + builder.build());
@@ -247,6 +272,7 @@ public class AmazonFragment extends Fragment {
 							data.setPrice(price);
 							priceFlag = false;
 						}
+						/*
 						else if(subPriceFlag){
 							parser.next();
 							String price = parser.getText();
@@ -255,6 +281,7 @@ public class AmazonFragment extends Fragment {
 							}
 							subPriceFlag = false;							
 						}
+						*/
 					}
 
 					break;

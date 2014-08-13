@@ -5,6 +5,9 @@
     
     <string name="action_search">検索</string>
     <string name="action_category">カテゴリ設定</string>
+    <string name="action_category_title">カテゴリを選択</string>
+    <string name="action_sort">並べ替え設定</string>
+    <string name="action_sort_title">並べ替え順を選択</string>
     
     <string name="tab1">Amazon</string>
     <string name="tab2">楽天</string>
@@ -24,12 +27,12 @@
     <string name="search_unit">件</string>
     <string name="search_error">情報を取得できませんでした</string>
 
-    <string name="action_category_title">カテゴリを選択</string>
-
     <string name="dialog_submit">決定</string>
     
     <string name="dialog_notify_title">インフォメーション</string>
 	<string name="dialog_notify_message">右上の虫眼鏡アイコンをタップして商品を検索してください</string>
 	<string name="dialog_notify_check">今後表示しない</string>
 	<string name="dialog_ok">はい</string>
+	
+	<string name="dialog_alert_message">並べ替えを設定する場合はカテゴリを設定してください</string>
 </resources>
