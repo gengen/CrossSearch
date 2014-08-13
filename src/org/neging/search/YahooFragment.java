@@ -62,7 +62,7 @@ public class YahooFragment extends Fragment {
 	};
 	
 	String[] mSorts = {
-			"score",	//w’è–³‚µ
+			"+score",	//w’è–³‚µ
 			"+price",	//‰¿Ši‚Ì’á‚¢‡
 			"-price"	//‰¿Ši‚Ì‚‚¢‡
 	};

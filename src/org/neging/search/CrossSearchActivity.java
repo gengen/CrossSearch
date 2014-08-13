@@ -34,7 +34,7 @@ import android.widget.Toast;
 
 public class CrossSearchActivity extends ActionBarActivity{
 	public static final String TAG = "CrossSearch";
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
     public static final String PREF_KEY = "pref";
 
     SearchView mSearchView = null;

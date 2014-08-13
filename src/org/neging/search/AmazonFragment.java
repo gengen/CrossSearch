@@ -240,7 +240,7 @@ public class AmazonFragment extends Fragment {
 					else if(tagName.equals("TotalPages")){
 						parser.next();
 						mTotalPages = Integer.valueOf(parser.getText());
-						Log.d(TAG, "totalpage = " + mTotalPages);
+						//Log.d(TAG, "totalpage = " + mTotalPages);
 					}
 					else if(tagName.equals("DetailPageURL")){
 						parser.next();
